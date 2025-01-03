@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('stocks', function (Blueprint $table) {
             $table->id();
+            $table->foreignIdFor(\App\Models\User::class, 'seller_id');
             $table->foreignIdFor(Product::class);
             $table->integer('quantity');
             $table->integer('alert_threshold')->default(20);
