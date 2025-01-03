@@ -14,13 +14,13 @@ return new class extends Migration
         Schema::create('kpis', function (Blueprint $table) {
             $table->id();
             $table->decimal('stock_value', 12, 2);
-            $table->decimal('last_stock_value', 12, 2);
+            $table->decimal('change_stock_value', 12, 2);
             $table->decimal('stock_rotation', 8, 2);
-            $table->decimal('last_stock_rotation', 8, 2);
+            $table->decimal('change_stock_rotation', 8, 2);
             $table->integer('unsold_items');
-            $table->integer('last_unsold_items');
+            $table->decimal('change_unsold_items', 8, 2);
             $table->decimal('monthly_debit', 12, 2);
-            $table->decimal('last_monthly_debit', 12, 2);
+            $table->decimal('change_monthly_debit', 12, 2);
             $table->timestamps();
         });
     }

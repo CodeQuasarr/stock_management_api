@@ -18,7 +18,7 @@ class Alert extends Model
      * @var list<string>
      */
     protected $fillable = [
-        'stock_id', 'type', 'message', 'resolved'
+        'stock_id', 'type', 'message', 'resolved', 'created_at', 'updated_at'
     ];
 
     public function stock(): BelongsTo

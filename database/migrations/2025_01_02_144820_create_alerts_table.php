@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\ProductBatch;
 use App\Models\Stock;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -14,7 +15,8 @@ return new class extends Migration
     {
         Schema::create('alerts', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Stock::class);
+            $table->foreignId('stock_id')->constrained('stocks');
+            $table->foreignIdFor(ProductBatch::class);
             $table->enum('type', ['expiration', 'low_stock', 'out_of_stock']);
             $table->text('message');
             $table->boolean('resolved')->default(false);

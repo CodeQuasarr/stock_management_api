@@ -1,7 +1,9 @@
 <?php
 
 use App\Models\Product;
+use App\Models\ProductBatch;
 use App\Models\Stock;
+use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -15,29 +17,20 @@ return new class extends Migration
     {
         Schema::create('stocks', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(\App\Models\User::class, 'seller_id');
             $table->foreignIdFor(Product::class);
-            $table->integer('quantity');
-            $table->integer('alert_threshold')->default(20);
-            $table->date('expiration_date');
-            $table->string('batch_number');
             $table->string('location');
+            $table->integer('quantity')->unsigned();
+            $table->integer('alert_threshold')->default(20)->unsigned();
             $table->timestamps();
         });
 
         Schema::create('stock_movements', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Stock::class);
-            $table->integer('quantity');
-            $table->enum('type', ['in', 'out']);
-            $table->text('reason')->nullable();
-            $table->timestamps();
-        });
-
-        Schema::create('stock_adjustments', function (Blueprint $table) {
-            $table->id();
-            $table->foreignIdFor(Stock::class);
-            $table->integer('quantity');
+            $table->foreignIdFor(ProductBatch::class);
+            $table->foreignIdFor(User::class);
+            $table->integer('quantity')->unsigned();
+            $table->enum('type', ['in', 'out', 'adjustment']);
             $table->text('reason');
             $table->timestamps();
         });
@@ -50,6 +43,5 @@ return new class extends Migration
     {
         Schema::dropIfExists('stocks');
         Schema::dropIfExists('stock_movements');
-        Schema::dropIfExists('stock_adjustments');
     }
 };

@@ -18,11 +18,16 @@ class Sale extends Model
      * @var list<string>
      */
     protected $fillable = [
-        'product_id', 'quantity', 'total_price'
+        'product_id', 'quantity', 'total_price', 'created_at', 'updated_at'
     ];
 
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function stock(): BelongsTo
+    {
+        return $this->belongsTo(Stock::class);
     }
 }

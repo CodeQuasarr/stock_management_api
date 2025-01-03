@@ -22,8 +22,9 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             ProductSeeder::class,
-            StockSeeder::class,
-            AlertStockSeeder::class,
+//            StockSeeder::class,
+//            AlertStockSeeder::class,
+//            SaleStockSeeder::class,
         ]);
     }
 }

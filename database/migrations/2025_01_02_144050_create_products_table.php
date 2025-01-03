@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Product;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -18,11 +19,18 @@ return new class extends Migration
             $table->string('therapeutic_category');
             $table->decimal('purchase_price', 8, 2);
             $table->decimal('sale_price', 8, 2);
-            $table->decimal('profit_margin', 8, 2);
             $table->string('manufacturer');
             $table->text('description');
             $table->timestamps();
             $table->softDeletes();
+        });
+
+        Schema::create('product_batches', function (Blueprint $table) {
+            $table->id();
+            $table->foreignIdFor(Product::class);
+            $table->date('expiration_date');
+            $table->string('batch_number');
+            $table->timestamps();
         });
     }
 
@@ -32,5 +40,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('products');
+        Schema::dropIfExists('product_batches');
     }
 };

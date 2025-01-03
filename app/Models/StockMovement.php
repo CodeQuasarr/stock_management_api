@@ -18,7 +18,7 @@ class StockMovement extends Model
      * @var list<string>
      */
     protected $fillable = [
-        'stock_id', 'quantity', 'type', 'reason'
+        'stock_id', 'quantity', 'type', 'reason', 'created_at', 'updated_at'
     ];
 
     public function stock(): BelongsTo
