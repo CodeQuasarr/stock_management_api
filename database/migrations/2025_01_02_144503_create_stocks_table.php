@@ -17,6 +17,7 @@ return new class extends Migration
     {
         Schema::create('stocks', function (Blueprint $table) {
             $table->id();
+            $table->foreignIdFor(User::class, 'seller_id');
             $table->foreignIdFor(Product::class);
             $table->string('location');
             $table->integer('quantity')->unsigned();

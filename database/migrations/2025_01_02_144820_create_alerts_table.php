@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('alerts', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('stock_id')->constrained('stocks');
+            $table->foreignIdFor(Stock::class);
             $table->foreignIdFor(ProductBatch::class);
             $table->enum('type', ['expiration', 'low_stock', 'out_of_stock']);
             $table->text('message');

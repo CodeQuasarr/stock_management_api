@@ -13,7 +13,7 @@ class kpi extends Model
      * @var list<string>
      */
     protected $fillable = [
-        'stock_value', 'change_stock_value', 'stock_rotation', 'change_stock_rotation', 'unsold_items', 'change_unsold_items', 'monthly_debit', 'change_monthly_debit',
+        'stock_id', 'stock_value', 'change_stock_value', 'stock_rotation', 'change_stock_rotation', 'unsold_items', 'change_unsold_items', 'monthly_debit', 'change_monthly_debit',
     ];
 
     public function product(): BelongsTo

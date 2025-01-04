@@ -19,7 +19,7 @@ class Stock extends Model
      * @var list<string>
      */
     protected $fillable = [
-        'product_id', 'quantity', 'alert_threshold', 'expiration_date', 'batch_number', 'location', 'created_at', 'updated_at'
+        'seller_id', 'product_id', 'quantity', 'alert_threshold', 'expiration_date', 'batch_number', 'location', 'created_at', 'updated_at'
     ];
 
     public function product(): BelongsTo
@@ -45,5 +45,10 @@ class Stock extends Model
     public function sales(): HasMany
     {
         return $this->hasMany(Sale::class);
+    }
+
+    public function kpis(): HasMany
+    {
+        return $this->hasMany(kpi::class);
     }
 }
