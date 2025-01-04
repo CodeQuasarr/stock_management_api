@@ -4,362 +4,260 @@ namespace Database\Seeders;
 
 use App\Models\Alert;
 use App\Models\Product;
+use App\Models\ProductBatch;
+use App\Models\Sale;
 use App\Models\Stock;
-use App\Models\StockAdjustment;
 use App\Models\StockMovement;
+use App\Models\User;
 use Carbon\Carbon;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class StockSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
+
     public function run(): void
     {
+        $user = User::create([
+            'name' => 'Admin',
+            'email' => 'admin@pharmacy.com',
+            'password' => bcrypt('password'),
+        ]);
+        $products = [
+            [
+                'name' => 'Paracétamol 500mg',
+                'unique_code' => 'PARA500',
+                'therapeutic_category' => 'Antidouleur et antipyrétique',
+                'purchase_price' => 2.50,
+                'sale_price' => 5.00,
+                'manufacturer' => 'Laboratoire X',
+                'description' => 'Soulage la douleur et réduit la fièvre.',
+            ],
+            [
+                'name' => 'Ibuprofène 400mg',
+                'unique_code' => 'IBU400',
+                'therapeutic_category' => 'Anti-inflammatoire non stéroïdien',
+                'purchase_price' => 3.00,
+                'sale_price' => 6.00,
+                'manufacturer' => 'Laboratoire Y',
+                'description' => 'Soulage la douleur et l\'inflammation.',
+            ],
+            [
+                'name' => 'Amoxicilline 500mg',
+                'unique_code' => 'AMOX500',
+                'therapeutic_category' => 'Antibiotique',
+                'purchase_price' => 4.00,
+                'sale_price' => 8.00,
+                'manufacturer' => 'Laboratoire Z',
+                'description' => 'Traite les infections bactériennes.',
+            ],
+            [
+                'name' => 'Oméprazole 20mg',
+                'unique_code' => 'OME20',
+                'therapeutic_category' => 'Antiulcéreux',
+                'purchase_price' => 3.50,
+                'sale_price' => 7.00,
+                'manufacturer' => 'Laboratoire A',
+                'description' => 'Traite les brûlures d\'estomac et les ulcères.',
+            ],
+            [
+                'name' => 'Vitamine C 1000mg',
+                'unique_code' => 'VITC1000',
+                'therapeutic_category' => 'Complément alimentaire',
+                'purchase_price' => 1.50,
+                'sale_price' => 3.00,
+                'manufacturer' => 'Laboratoire B',
+                'description' => 'Renforce le système immunitaire.',
+            ],
+            [
+                'name' => 'Doliprane 1000mg',
+                'unique_code' => 'DOL1000',
+                'therapeutic_category' => 'Antidouleur et antipyrétique',
+                'purchase_price' => 3.00,
+                'sale_price' => 6.00,
+                'manufacturer' => 'Laboratoire C',
+                'description' => 'Soulage la douleur et réduit la fièvre.',
+            ],
+            [
+                'name' => 'Aspirine 500mg',
+                'unique_code' => 'ASP500',
+                'therapeutic_category' => 'Antidouleur et antipyrétique',
+                'purchase_price' => 2.00,
+                'sale_price' => 4.00,
+                'manufacturer' => 'Laboratoire D',
+                'description' => 'Soulage la douleur et réduit l\'inflammation.',
+            ],
+            [
+                'name' => 'Levothyrox 25µg',
+                'unique_code' => 'LEVO25',
+                'therapeutic_category' => 'Hormone thyroïdienne',
+                'purchase_price' => 5.00,
+                'sale_price' => 10.00,
+                'manufacturer' => 'Laboratoire E',
+                'description' => 'Traite l\'hypothyroïdie.',
+            ],
+            [
+                'name' => 'Metformine 500mg',
+                'unique_code' => 'MET500',
+                'therapeutic_category' => 'Antidiabétique',
+                'purchase_price' => 2.50,
+                'sale_price' => 5.00,
+                'manufacturer' => 'Laboratoire F',
+                'description' => 'Traite le diabète de type 2.',
+            ],
+            [
+                'name' => 'Atorvastatine 20mg',
+                'unique_code' => 'ATO20',
+                'therapeutic_category' => 'Hypolipémiant',
+                'purchase_price' => 4.00,
+                'sale_price' => 8.00,
+                'manufacturer' => 'Laboratoire G',
+                'description' => 'Réduit le cholestérol.',
+            ],
+            [
+                'name' => 'Loratadine 10mg',
+                'unique_code' => 'LORA10',
+                'therapeutic_category' => 'Antihistaminique',
+                'purchase_price' => 1.50,
+                'sale_price' => 3.00,
+                'manufacturer' => 'Laboratoire H',
+                'description' => 'Traite les allergies.',
+            ],
+            [
+                'name' => 'Diclofénac 50mg',
+                'unique_code' => 'DIC50',
+                'therapeutic_category' => 'Anti-inflammatoire non stéroïdien',
+                'purchase_price' => 3.00,
+                'sale_price' => 6.00,
+                'manufacturer' => 'Laboratoire I',
+                'description' => 'Soulage la douleur et l\'inflammation.',
+            ],
+            [
+                'name' => 'Tramadol 50mg',
+                'unique_code' => 'TRA50',
+                'therapeutic_category' => 'Antidouleur',
+                'purchase_price' => 4.50,
+                'sale_price' => 9.00,
+                'manufacturer' => 'Laboratoire J',
+                'description' => 'Soulage les douleurs modérées à sévères.',
+            ],
+            [
+                'name' => 'Cétirizine 10mg',
+                'unique_code' => 'CET10',
+                'therapeutic_category' => 'Antihistaminique',
+                'purchase_price' => 1.80,
+                'sale_price' => 3.60,
+                'manufacturer' => 'Laboratoire K',
+                'description' => 'Traite les allergies.',
+            ],
+            [
+                'name' => 'Simvastatine 20mg',
+                'unique_code' => 'SIM20',
+                'therapeutic_category' => 'Hypolipémiant',
+                'purchase_price' => 3.50,
+                'sale_price' => 7.00,
+                'manufacturer' => 'Laboratoire L',
+                'description' => 'Réduit le cholestérol.',
+            ],
+            [
+                'name' => 'Diazépam 5mg',
+                'unique_code' => 'DIA5',
+                'therapeutic_category' => 'Anxiolytique',
+                'purchase_price' => 2.00,
+                'sale_price' => 4.00,
+                'manufacturer' => 'Laboratoire M',
+                'description' => 'Traite l\'anxiété et les troubles du sommeil.',
+            ],
+            [
+                'name' => 'Fluoxétine 20mg',
+                'unique_code' => 'FLU20',
+                'therapeutic_category' => 'Antidépresseur',
+                'purchase_price' => 3.00,
+                'sale_price' => 6.00,
+                'manufacturer' => 'Laboratoire N',
+                'description' => 'Traite la dépression.',
+            ],
+        ];
 
-        $stocks = [];
-        foreach (Product::all() as $product) {
-            $stocks[] = [
+        $currentMonthStart = Carbon::now()->subMonth()->startOfMonth();
+        $currentMonthEnd = Carbon::now()->subMonth()->endOfMonth();
+
+        foreach ($products as $productData) {
+            $product = Product::create($productData);
+            $initialQuantity = rand(20, 100); // Quantité initiale aléatoire
+
+            // Créer des lots de produits pour chaque produit
+            $batch = ProductBatch::create([
+                'product_id' => $product->id,
+                'expiration_date' => now()->addYears(2), // Date d'expiration dans 2 ans
+                'batch_number' => 'BATCH-' . $product->unique_code,
+            ]);
+
+            // Random date between $currentMonthStart and $currentMonthEnd
+            $randomDate = Carbon::createFromTimestamp(rand($currentMonthStart->timestamp, $currentMonthEnd->timestamp));
+
+            // Créer des stocks pour chaque produit
+            $stock = Stock::create([
                 'seller_id' => rand(1, 10),
                 'product_id' => $product->id,
-                'quantity' => rand(5, 50),
-                'alert_threshold' => rand(10, 30),
-                'expiration_date' => now()->addMonths(rand(6, 24))->format('Y-m-d'),
-                'batch_number' => 'LOT' . rand(10000, 99999),
-                'location' => 'Aisle ' . rand(1, 5) . ', Shelf ' . rand(1, 5),
-            ];
-        }
+                'location' => 'Entrepôt A',
+                'quantity' => $initialQuantity, // Quantité initiale
+                'alert_threshold' => 20,
+                'created_at' => $randomDate,
+                'updated_at' => $randomDate,
+            ]);
 
-        // Mouvements de stock
-        $stockMovements = [];
-        foreach ($stocks as $index => $stock) {
-            $movementCount = rand(2, 5);
-            for ($i = 0; $i < $movementCount; $i++) {
-                $stockMovements[] = [
-                    'stock_id' => $index + 1,
-                    'quantity' => rand(10, 50),
-                    'type' => rand(0, 1) ? 'in' : 'out',
-                    'reason' => rand(0, 1) ? 'Réapprovisionnement' : 'Vente',
-                ];
+            // Créer des mouvements de stock (entrée initiale)
+            StockMovement::create([
+                'stock_id' => $stock->id,
+                'product_batch_id' => $batch->id,
+                'user_id' => $user->id,
+                'quantity' => $stock->quantity,
+                'type' => 'in',
+                'reason' => 'Stock initial',
+                'created_at' => $randomDate,
+                'updated_at' => $randomDate,
+            ]);
+
+            $saleQuantity = rand(5, 20); // Quantité vendue aléatoire
+            $randomDateSale = $randomDate->addDays(rand(1, 30));
+            if ($stock->quantity >= $saleQuantity) {
+                Sale::create([
+                    'product_id' => $product->id,
+                    'product_batch_id' => $batch->id,
+                    'user_id' => $user->id,
+                    'quantity' => $saleQuantity,
+                    'created_at' => $randomDateSale,
+                    'updated_at' => $randomDateSale,
+                ]);
+                // Réduire la quantité en stock après la vente
+                $stock->decrement('quantity', $saleQuantity);
+                $stock->updated_at = $randomDateSale;
+                $stock->save();
+
+                // Créer un mouvement de stock (vente)
+                StockMovement::create([
+                    'stock_id' => $stock->id,
+                    'product_batch_id' => $batch->id,
+                    'user_id' => $user->id,
+                    'quantity' => $saleQuantity,
+                    'type' => 'out',
+                    'reason' => 'Vente de produits',
+                    'created_at' => $randomDateSale,
+                ]);
+
+            }
+            // Vérifier si une alerte doit être créée (stock faible)
+            if ($stock->quantity <= $stock->alert_threshold) {
+                Alert::create([
+                    'stock_id' => $stock->id,
+                    'product_batch_id' => $batch->id,
+                    'type' => 'low_stock',
+                    'message' => 'Stock faible pour ' . $product->name . ' (' . $stock->quantity . ' restants)',
+                    'resolved' => false,
+                    'created_at' => $stock->updated_at,
+                    'updated_at' => $stock->updated_at,
+                ]);
             }
         }
-
-        // Ajustements de stock
-        $stockAdjustments = [];
-        foreach ($stocks as $index => $stock) {
-            $adjustmentCount = rand(1, 3);
-            for ($i = 0; $i < $adjustmentCount; $i++) {
-                $stockAdjustments[] = [
-                    'stock_id' => $index + 1,
-                    'quantity' => rand(-10, 10),
-                    'reason' => rand(0, 1) ? 'Produit endommagé' : 'Erreur d\'inventaire',
-                ];
-            }
-        }
-
-
-        // Insérer les stocks
-        foreach ($stocks as $stock) {
-            Stock::create($stock);
-        }
-
-        // Insérer les mouvements de stock
-        foreach ($stockMovements as $movement) {
-            StockMovement::create($movement);
-        }
-
-        // Insérer les ajustements de stock
-        foreach ($stockAdjustments as $adjustment) {
-            StockAdjustment::create($adjustment);
-        }
-
-
-
-//        $stocks = [
-//            [
-//                'product_id' => 1, // Paracétamol 500mg
-//                'quantity' => 100,
-//                'alert_threshold' => 20,
-//                'expiration_date' => '2024-12-31',
-//                'batch_number' => 'LOT12345',
-//                'location' => 'Aisle 1, Shelf 2',
-//            ],
-//            [
-//                'product_id' => 2, // Ibuprofène 400mg
-//                'quantity' => 75,
-//                'alert_threshold' => 15,
-//                'expiration_date' => '2025-06-30',
-//                'batch_number' => 'LOT67890',
-//                'location' => 'Aisle 1, Shelf 3',
-//            ],
-//            [
-//                'product_id' => 3, // Amoxicilline 500mg
-//                'quantity' => 50,
-//                'alert_threshold' => 10,
-//                'expiration_date' => '2024-11-15',
-//                'batch_number' => 'LOT54321',
-//                'location' => 'Aisle 2, Shelf 1',
-//            ],
-//            [
-//                'product_id' => 4, // Oméprazole 20mg
-//                'quantity' => 60,
-//                'alert_threshold' => 12,
-//                'expiration_date' => '2025-03-31',
-//                'batch_number' => 'LOT13579',
-//                'location' => 'Aisle 2, Shelf 2',
-//            ],
-//            [
-//                'product_id' => 5, // Vitamine C 1000mg
-//                'quantity' => 40,
-//                'alert_threshold' => 8,
-//                'expiration_date' => '2023-09-30',
-//                'batch_number' => 'LOT24680',
-//                'location' => 'Aisle 2, Shelf 3',
-//            ],
-//            [
-//                'product_id' => 6, // Paracétamol 1000mg
-//                'quantity' => 30,
-//                'alert_threshold' => 6,
-//                'expiration_date' => '2024-12-31',
-//                'batch_number' => 'LOT13579',
-//                'location' => 'Aisle 3, Shelf 1',
-//            ],
-//            // generer 7 autres stocks
-//            [
-//                'product_id' => 7, // Ibuprofène 600mg
-//                'quantity' => 25,
-//                'alert_threshold' => 5,
-//                'expiration_date' => '2025-06-30',
-//                'batch_number' => 'LOT67890',
-//                'location' => 'Aisle 3, Shelf 2',
-//            ],
-//            [
-//                'product_id' => 8, // Amoxicilline 250mg
-//                'quantity' => 20,
-//                'alert_threshold' => 4,
-//                'expiration_date' => '2024-11-15',
-//                'batch_number' => 'LOT54321',
-//                'location' => 'Aisle 3, Shelf 3',
-//            ],
-//            [
-//                'product_id' => 9, // Oméprazole 40mg
-//                'quantity' => 15,
-//                'alert_threshold' => 3,
-//                'expiration_date' => '2025-03-31',
-//                'batch_number' => 'LOT13579',
-//                'location' => 'Aisle 4, Shelf 1',
-//            ],
-//            [
-//                'product_id' => 10, // Vitamine C 500mg
-//                'quantity' => 10,
-//                'alert_threshold' => 2,
-//                'expiration_date' => '2023-09-30',
-//                'batch_number' => 'LOT24680',
-//                'location' => 'Aisle 4, Shelf 2',
-//            ],
-//            [
-//                'product_id' => 11, // Paracétamol 2000mg
-//                'quantity' => 5,
-//                'alert_threshold' => 1,
-//                'expiration_date' => '2024-12-31',
-//                'batch_number' => 'LOT13579',
-//                'location' => 'Aisle 4, Shelf 3',
-//            ],
-//            [
-//                'product_id' => 12, // Ibuprofène 800mg
-//                'quantity' => 2,
-//                'alert_threshold' => 1,
-//                'expiration_date' => '2025-06-30',
-//                'batch_number' => 'LOT67890',
-//                'location' => 'Aisle 5, Shelf 1',
-//            ],
-//            [
-//                'product_id' => 13, // Amoxicilline 125mg
-//                'quantity' => 1,
-//                'alert_threshold' => 1,
-//                'expiration_date' => '2024-11-15',
-//                'batch_number' => 'LOT54321',
-//                'location' => 'Aisle 5, Shelf 2',
-//            ],
-//            [
-//                'product_id' => 14, // Oméprazole 10mg
-//                'quantity' => 1,
-//                'alert_threshold' => 1,
-//                'expiration_date' => '2025-03-31',
-//                'batch_number' => 'LOT13579',
-//                'location' => 'Aisle 5, Shelf 3',
-//            ],
-//            [
-//                'product_id' => 15, // Vitamine C 250mg
-//                'quantity' => 1,
-//                'alert_threshold' => 1,
-//                'expiration_date' => '2023-09-30',
-//                'batch_number' => 'LOT24680',
-//                'location' => 'Aisle 6, Shelf 1',
-//            ],
-//            [
-//                'product_id' => 16, // Paracétamol 250mg
-//                'quantity' => 1,
-//                'alert_threshold' => 1,
-//                'expiration_date' => '2024-12-31',
-//                'batch_number' => 'LOT13579',
-//                'location' => 'Aisle 6, Shelf 2',
-//            ],
-//            [
-//                'product_id' => 17, // Ibuprofène 200mg
-//                'quantity' => 1,
-//                'alert_threshold' => 1,
-//                'expiration_date' => '2025-06-30',
-//                'batch_number' => 'LOT67890',
-//                'location' => 'Aisle 6, Shelf 3',
-//            ],
-//            [
-//                'product_id' => 18, // Amoxicilline 62.5mg
-//                'quantity' => 1,
-//                'alert_threshold' => 1,
-//                'expiration_date' => '2024-11-15',
-//                'batch_number' => 'LOT54321',
-//                'location' => 'Aisle 7, Shelf 1',
-//            ],
-//            [
-//                'product_id' => 19, // Oméprazole 5mg
-//                'quantity' => 1,
-//                'alert_threshold' => 1,
-//                'expiration_date' => '2025-03-31',
-//                'batch_number' => 'LOT13579',
-//                'location' => 'Aisle 7, Shelf 2',
-//            ],
-//            [
-//                'product_id' => 20, // Vitamine C 125mg
-//                'quantity' => 1,
-//                'alert_threshold' => 1,
-//                'expiration_date' => '2023-09-30',
-//                'batch_number' => 'LOT24680',
-//                'location' => 'Aisle 7, Shelf 3',
-//            ]
-//
-//        ];
-//
-//        $stockMovements = [
-//            [
-//                'stock_id' => 1, // Paracétamol 500mg
-//                'quantity' => 50,
-//                'type' => 'in', // Entrée de stock
-//                'reason' => 'Réapprovisionnement',
-//            ],
-//            [
-//                'stock_id' => 1, // Paracétamol 500mg
-//                'quantity' => 10,
-//                'type' => 'out', // Sortie de stock
-//                'reason' => 'Vente',
-//            ],
-//            [
-//                'stock_id' => 2, // Ibuprofène 400mg
-//                'quantity' => 25,
-//                'type' => 'in', // Entrée de stock
-//                'reason' => 'Réapprovisionnement',
-//            ],
-//            [
-//                'stock_id' => 3, // Amoxicilline 500mg
-//                'quantity' => 15,
-//                'type' => 'out', // Sortie de stock
-//                'reason' => 'Vente',
-//            ],
-//            [
-//                'stock_id' => 4, // Oméprazole 20mg
-//                'quantity' => 20,
-//                'type' => 'in', // Entrée de stock
-//                'reason' => 'Réapprovisionnement',
-//            ],
-//            [
-//                'stock_id' => 5, // Vitamine C 1000mg
-//                'quantity' => 10,
-//                'type' => 'out', // Sortie de stock
-//                'reason' => 'Vente',
-//            ],
-//            [
-//                'stock_id' => 6, // Paracétamol 1000mg
-//                'quantity' => 5,
-//                'type' => 'in', // Entrée de stock
-//                'reason' => 'Réapprovisionnement',
-//            ],
-//            [
-//                'stock_id' => 7, // Ibuprofène 600mg
-//                'quantity' => 5,
-//                'type' => 'in', // Entrée de stock
-//                'reason' => 'Réapprovisionnement',
-//            ],
-//            [
-//                'stock_id' => 8, // Amoxicilline 250mg
-//                'quantity' => 5,
-//                'type' => 'in', // Entrée de stock
-//                'reason' => 'Réapprovisionnement',
-//            ],
-//            [
-//                'stock_id' => 9, // Oméprazole 40mg
-//                'quantity' => 5,
-//                'type' => 'in', // Entrée de stock
-//                'reason' => 'Réapprovisionnement',
-//            ],
-//            [
-//                'stock_id' => 10, // Vitamine C 500mg
-//                'quantity' => 5,
-//                'type' => 'in', // Entrée de stock
-//                'reason' => 'Réapprovisionnement',
-//            ],
-//            [
-//                'stock_id' => 11, // Paracétamol 2000mg
-//                'quantity' => 5,
-//                'type' => 'in', // Entrée de stock
-//                'reason' => 'Réapprovisionnement',
-//            ],
-//            [
-//                'stock_id' => 12, // Ibuprofène 800mg
-//                'quantity' => 5,
-//                'type' => 'in', // Entrée de stock
-//                'reason' => 'Réapprovisionnement',
-//            ],
-//            [
-//                'stock_id' => 13, // Amoxicilline 125mg
-//                'quantity' => 5,
-//                'type' => 'in', // Entrée de stock
-//                'reason' => 'Réapprovisionnement',
-//            ],
-//            [
-//                'stock_id' => 14, // Oméprazole 10mg
-//                'quantity' => 5,
-//                'type' => 'in', // Entrée de stock
-//                'reason' => 'Réapprovisionnement',
-//            ],
-//            [
-//                'stock_id' => 15, // Vitamine C 250mg
-//                'quantity' => 5,
-//                'type' => 'in', // Entrée de stock
-//                'reason' => 'Réapprovisionnement',
-//            ],
-//            [
-//                'stock_id
-//            ]
-//        ];
-//
-//        $stockAdjustments = [
-//            [
-//                'stock_id' => 1, // Paracétamol 500mg
-//                'quantity' => -5, // Ajustement négatif (perte ou erreur)
-//                'reason' => 'Produit endommagé',
-//            ],
-//            [
-//                'stock_id' => 2, // Ibuprofène 400mg
-//                'quantity' => 10, // Ajustement positif (ajout manuel)
-//                'reason' => 'Erreur d\'inventaire',
-//            ],
-//            [
-//                'stock_id' => 3, // Amoxicilline 500mg
-//                'quantity' => -3, // Ajustement négatif (perte ou erreur)
-//                'reason' => 'Produit périmé',
-//            ],
-//        ];
     }
 }
