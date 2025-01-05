@@ -1,17 +1,18 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\statitics;
 
-use App\Http\Resources\Stocks\StockStatisticResource;
+use App\Http\Resources\Stocks\StockKpisResource;
 use App\Models\kpi;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
 
-class StockStatisticService
+class StockKpisService
 {
 
     /**
      * Récupération des statistiques de stock
+     * @param int|null $stockId
      * @return array
      */
     public function getStockStatistics(?int $stockId = null): array
@@ -37,7 +38,7 @@ class StockStatisticService
             // Retour en cas de succès
             return [
                 'success' => true,
-                'data' => $stockStatistic ? new StockStatisticResource($stockStatistic) : null,
+                'data' => $stockStatistic ? new StockKpisResource($stockStatistic) : null,
                 'stockItems' => $stockItems,
                 'message' => 'Statistiques récupérées avec succès.',
                 'status' => 200,

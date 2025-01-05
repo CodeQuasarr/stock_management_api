@@ -9,6 +9,10 @@ use Illuminate\Support\Collection;
 
 abstract class BaseService implements ServiceInterface
 {
+    public function __construct()
+    {
+    }
+
     /**
      * @param Collection $data
      * @return JsonResponse

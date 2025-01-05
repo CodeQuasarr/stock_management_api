@@ -9,6 +9,9 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 Route::prefix('v1')->group(function () {
+
+    Route::apiResource('dashboard', Das::class);
+
     Route::prefix('stocks')->group(function () {
         Route::get('statistics', [SotckStatisticController::class, 'index']);
     });

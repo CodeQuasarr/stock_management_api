@@ -5,7 +5,7 @@ namespace App\Http\Resources\Stocks;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class StockStatisticResource extends JsonResource
+class StockKpisResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
