@@ -17,11 +17,16 @@ class StockStatisticService
      * Récupération des statistiques de stock
      * @return array
      */
-    public function getStockStatistics(?int $stockId = null): array
+    public function getStockStatistics(?int $productId = null): array
     {
         try {
             $stockItems = $this->getStockCategoryForUser();
-            $currentStock = Stock::find($stockId ?? $stockItems[0]['value']);
+
+            if (is_null($productId)) {
+                $currentStock = Stock::find($stockItems[0]['value']);
+            } else {
+                $currentStock = Stock::query()->where('product_id', $productId)->first();
+            }
             $stockStatistic = $this->generateKpis($currentStock);
             $stockEvolution = $this->getStockEvolutionForUser($currentStock);
 

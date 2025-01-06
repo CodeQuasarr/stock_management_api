@@ -25,8 +25,9 @@ class SotckStatisticController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
+        $productId = $request->has('product_id') ? $request->get('product_id') : null;
         // Appel au service
-        $response = $this->stockStatisticService->getStockStatistics();
+        $response = $this->stockStatisticService->getStockStatistics($productId);
 
         // Retour de la réponse structurée
         return response()->json([
