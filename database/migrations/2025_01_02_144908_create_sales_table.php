@@ -17,9 +17,8 @@ return new class extends Migration
         Schema::create('sales', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Product::class);
-            $table->foreignIdFor(ProductBatch::class);
-            $table->foreignIdFor(User::class)->constrained('users');
             $table->integer('quantity')->unsigned();
+            $table->dateTime('sale_date');
             $table->timestamps();
         });
     }

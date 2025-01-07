@@ -22,9 +22,9 @@ class Product extends Model
         'name', 'unique_code', 'therapeutic_category', 'purchase_price', 'sale_price', 'profit_margin', 'manufacturer', 'description'
     ];
 
-    public function stocks(): HasMany
+    public function batches(): HasMany
     {
-        return $this->hasMany(Stock::class);
+        return $this->hasMany(ProductBatch::class);
     }
 
     public function sales(): HasMany
@@ -32,8 +32,8 @@ class Product extends Model
         return $this->hasMany(Sale::class);
     }
 
-    public function productBatch(): HasOne
+    public function stockMovements(): HasMany
     {
-        return $this->hasOne(ProductBatch::class);
+        return $this->hasMany(StockMovement::class);
     }
 }

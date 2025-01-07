@@ -18,11 +18,16 @@ class StockMovement extends Model
      * @var list<string>
      */
     protected $fillable = [
-        'stock_id', 'quantity', 'type', 'reason', 'created_at', 'updated_at'
+        'product_id', 'batch_id', 'type', 'quantity', 'date', 'reason',
     ];
 
-    public function stock(): BelongsTo
+    public function product(): BelongsTo
     {
-        return $this->belongsTo(Stock::class);
+        return $this->belongsTo(Product::class);
+    }
+
+    public function batch(): BelongsTo
+    {
+        return $this->belongsTo(ProductBatch::class);
     }
 }

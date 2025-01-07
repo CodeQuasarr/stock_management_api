@@ -15,24 +15,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('stocks', function (Blueprint $table) {
-            $table->id();
-            $table->foreignIdFor(User::class, 'seller_id');
-            $table->foreignIdFor(Product::class);
-            $table->string('location');
-            $table->integer('quantity')->unsigned();
-            $table->integer('alert_threshold')->default(20)->unsigned();
-            $table->timestamps();
-        });
-
         Schema::create('stock_movements', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Stock::class);
-            $table->foreignIdFor(ProductBatch::class);
-            $table->foreignIdFor(User::class);
+            $table->foreignIdFor(Product::class);
+            $table->foreignIdFor(ProductBatch::class, 'batch_id');
             $table->integer('quantity')->unsigned();
             $table->enum('type', ['in', 'out', 'adjustment']);
             $table->text('reason');
+            $table->dateTime('date');
             $table->timestamps();
         });
     }
@@ -42,7 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('stocks');
         Schema::dropIfExists('stock_movements');
     }
 };

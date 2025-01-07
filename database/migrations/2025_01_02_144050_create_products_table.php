@@ -29,7 +29,7 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(Product::class);
             $table->date('expiration_date');
-            $table->string('batch_number');
+            $table->integer('quantity')->unsigned();
             $table->timestamps();
         });
     }
