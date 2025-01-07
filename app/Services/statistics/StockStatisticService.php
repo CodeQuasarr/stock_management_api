@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Services\statitics;
+namespace App\Services\statistics;
 
 use App\Http\Resources\Stocks\StockKpisResource;
 use App\Models\kpi;
-use App\Models\Stock;
+use App\Models\Product;
 use App\Models\StockMovement;
-use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
@@ -15,26 +14,28 @@ class StockStatisticService
 
     /**
      * Récupération des statistiques de stock
+     * @param string|null $uniqueCode
      * @return array
      */
-    public function getStockStatistics(?int $productId = null): array
+    public function getStockStatistics(?string $uniqueCode = null): array
     {
         try {
-            $stockItems = $this->getStockCategoryForUser();
+            $stockItems = Product::query()->get()->map(function ($product) {
+                return [
+                    'value' => $product->unique_code,
+                    'label' => $product->name,
+                ];
+            });
 
-            if (is_null($productId)) {
-                $currentStock = Stock::find($stockItems[0]['value']);
-            } else {
-                $currentStock = Stock::query()->where('product_id', $productId)->first();
-            }
-            $stockStatistic = $this->generateKpis($currentStock);
-            $stockEvolution = $this->getStockEvolutionForUser($currentStock);
+            $product = Product::query()->where('unique_code', $uniqueCode ?? $stockItems[0]['value']);
+            $stockStatistic = $this->generateKpis($product->first());
+            $stockEvolution = $this->getStockEvolutionForUser($product->first());
 
             // Retour en cas de succès
             return [
                 'success' => true,
                 'data' => $stockStatistic ? new StockKpisResource($stockStatistic) : null,
-                'stockItems' => $stockItems,
+                'stockItems' => $stockItems->toArray(),
                 'stockEvolution' => $stockEvolution,
                 'message' => 'Statistiques récupérées avec succès.',
                 'status' => 200,
@@ -53,53 +54,31 @@ class StockStatisticService
     }
 
     /**
-     * @throws \Exception
+     * Génère les KPIs pour un produit donné
+     * @param Product $product
+     * @return kpi|null
      */
-    /**
-     * @throws \Exception
-     */
-    /**
-     * @throws \Exception
-     */
-    public function getStockCategoryForUser()
+    public function generateKpis(Product $product): ?kpi
     {
-        $seller = User::find(8);
-        if (!$seller) {
-            throw new \Exception("Utilisateur non trouvé.");
-        }
-
-        $stockModel = $seller->stocks();
-        if (!$stockModel) {
-            throw new \Exception("Aucun stock trouvé pour cet utilisateur.");
-        }
-
-        $stockItems = $stockModel->get()->map(function ($stock) {
-            if (!$stock->product) {
-                throw new \Exception("Produit non trouvé pour le stock.");
-            }
-            return [
-                'value' => $stock->product->getKey(),
-                'label' => $stock->product->name,
-            ];
-        });
-
-        return $stockItems;
+        // Récupération de la statistique de stock
+        return kpi::query()->where('product_id', $product->getKey())->latest()->first();
     }
 
-    public function generateKpis(Stock $stock)
+    /**
+     * Récupère l'évolution des stocks pour un produit donné
+     * @param Product $product
+     * @param string|null $year
+     * @return array
+     */
+    public function getStockEvolutionForUser(Product $product, string $year = null): array
     {
-        // Récupération du statistique de stock
-        return kpi::query()->where('stock_id', $stock->getKey())->latest()->first();
-    }
-
-    public function getStockEvolutionForUser(Stock $stock, string $year = null) {
         if (is_null($year)) {
             $year = Carbon::now()->year;
         }
         // Utilisation de Carbon pour gérer les dates
         $currentMonthStart = Carbon::create($year, 1, 1, 0, 0, 0);
         $currentMonthEnd = Carbon::create($year, 12, 31, 23, 59, 59);
-        $stockMovements = $stock->movements()->whereBetween('created_at', [$currentMonthStart, $currentMonthEnd])->get();
+        $stockMovements = $product->stockMovements()->whereBetween('created_at', [$currentMonthStart, $currentMonthEnd])->get();
 
         // Calculer la quantité actuelle en stock pour chaque produit
         // Initialiser les variables
@@ -110,7 +89,7 @@ class StockStatisticService
         // Calculer le stock cumulé
         foreach ($stockMovements as $index => $movement) {
             $quantity = $movement->quantity;
-            $action = $movement->type; // "in" ou "out"
+            $action = $movement->type;
 
             if ($index === 0 && $action === 'out') {
                 $movement = StockMovement::find($movement->getKey() - 1);

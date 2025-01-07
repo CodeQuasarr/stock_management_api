@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\statitics;
+namespace App\Services\statistics;
 
 use App\Actions\Statistics\Kpis\CalculateInitialQuantityAction;
 use App\Http\Resources\Stocks\StockKpisResource;

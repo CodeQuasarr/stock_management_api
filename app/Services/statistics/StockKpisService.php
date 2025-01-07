@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\statitics;
+namespace App\Services\statistics;
 
 use App\Http\Resources\Stocks\StockKpisResource;
 use App\Models\kpi;
