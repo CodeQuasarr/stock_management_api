@@ -58,7 +58,7 @@ class KpisCommand extends Command
         });
     }
 
-    public function getStockValueEvolution($productCode)
+    public function getStockValueEvolution($productCode): float|int
     {
         $product = Product::where('unique_code', $productCode)->first();
 
@@ -73,7 +73,7 @@ class KpisCommand extends Command
         return ($currentMonthValue - $previousMonthValue) / $previousMonthValue * 100;
     }
 
-    public function getStockTurnover($productCode)
+    public function getStockTurnover($productCode): float|int
     {
         $product = Product::where('unique_code', $productCode)->first();
 
@@ -94,7 +94,7 @@ class KpisCommand extends Command
         return ($soldQuantity / $averageStock) * 100;
     }
 
-    public function getStockTurnoverEvolution($productCode)
+    public function getStockTurnoverEvolution($productCode): float|int
     {
         $currentMonthTurnover = $this->getStockTurnover($productCode);
 
@@ -132,7 +132,7 @@ class KpisCommand extends Command
         return $totalStock - $soldQuantity;
     }
 
-    public function getUnsoldItemsEvolution($productCode)
+    public function getUnsoldItemsEvolution($productCode): float|int
     {
         $product = Product::where('unique_code', $productCode)->first();
 
@@ -157,7 +157,7 @@ class KpisCommand extends Command
         return ($currentMonthUnsold - $previousMonthUnsold) / $previousMonthUnsold * 100;
     }
 
-    public function getMonthlyDebit($productCode)
+    public function getMonthlyDebit($productCode): array
     {
         $product = Product::where('unique_code', $productCode)->first();
 

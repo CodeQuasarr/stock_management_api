@@ -13,11 +13,11 @@ interface ServiceInterface
 
     public function store(Collection $data): JsonResponse;
 
-    public function update(Collection $data, $id, Model $model = null): JsonResponse;
+    public function update(Collection $data, $id, Model $model = null);
 
     public function attach(Collection $data, Model $model, $relation = null): JsonResponse;
 
-    public function delete($id): JsonResponse;
+    public function delete(int $id);
 
 
 }

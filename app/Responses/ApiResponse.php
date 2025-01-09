@@ -28,15 +28,21 @@ class ApiResponse
         throw new HttpResponseException(response()->json(["message"=> $message], 500));
     }
 
-    public static function sendResponse($result , $message ,$code=200): JsonResponse
+    public static function sendResponse($result , $message ,$error = null, $code=200): array
     {
-        $response=[
-            'success' => true,
-            'data'    => $result
-        ];
-        if(!empty($message)){
-            $response['message'] =$message;
+        if ($code === 200) {
+            return [
+                'success' => true,
+                'data' => $result,
+                'message' => $message,
+                'status' => 200,
+            ];
         }
-        return response()->json($response, $code);
+        return [
+            'success' => false,
+            'message' => $message,
+            'error' => $error,
+            'status' => 500,
+        ];
     }
 }

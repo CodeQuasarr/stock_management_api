@@ -11,8 +11,6 @@ Route::get('/user', function (Request $request) {
 
 Route::prefix('v1')->group(function () {
 
-    Route::apiResource('dashboard', Das::class);
-
     Route::prefix('stocks')->group(function () {
         Route::get('statistics', [SotckStatisticController::class, 'index']);
 
@@ -20,6 +18,7 @@ Route::prefix('v1')->group(function () {
             Route::get('days-in-stock', [StockController::class, 'getDaysInStock']);
             Route::get('mouvements', [StockController::class, 'getProductMovements']);
         });
-
     });
+
+    Route::apiResource('stocks', StockController::class);
 });

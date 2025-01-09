@@ -7,11 +7,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product extends Model
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -35,5 +36,19 @@ class Product extends Model
     public function stockMovements(): HasMany
     {
         return $this->hasMany(StockMovement::class);
+    }
+
+    public function stockTotals(): int
+    {
+        $totalQuantity = 0;
+        $this->stockMovements()->each(function ($stockMovement) use (&$totalQuantity) {
+            if ($stockMovement->type === 'in') {
+                $totalQuantity += $stockMovement->quantity;
+            } else {
+                $totalQuantity -= $stockMovement->quantity;
+            }
+        });
+
+        return $totalQuantity;
     }
 }
