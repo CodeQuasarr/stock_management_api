@@ -28,21 +28,38 @@ class ApiResponse
         throw new HttpResponseException(response()->json(["message"=> $message], 500));
     }
 
-    public static function sendResponse($result , $message ,$error = null, $code=200): array
+    public static function mapResponse($data, $message = "Operation successful", $error = null, $code = 200): array
     {
         if ($code === 200) {
             return [
                 'success' => true,
-                'data' => $result,
+                'data' => $data,
                 'message' => $message,
-                'status' => 200,
+                'status' => $code,
+
             ];
         }
         return [
             'success' => false,
             'message' => $message,
             'error' => $error,
-            'status' => 500,
+            'status' => $code,
         ];
+    }
+
+    public static function sendResponse($result , $message ,$error = null, $code=200): JsonResponse
+    {
+        if ($code === 200) {
+            return response()->json([
+                'success' => true,
+                'data' => $result,
+                'message' => $message,
+            ], $code);
+        }
+        return response()->json([
+            'success' => false,
+            'message' => $message,
+            'error' => $error,
+        ], $code);
     }
 }

@@ -5,10 +5,10 @@ namespace App\Services;
 use App\Http\Resources\Stocks\StockMovementCollection;
 use App\Models\Product;
 use App\Models\StockMovement;
+use App\Responses\ApiResponse;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -17,10 +17,7 @@ use Illuminate\Support\Facades\Log;
 class StockService extends BaseService
 {
     public function __construct()
-    {
-        $model = new Product();
-        parent::__construct($model);
-    }
+    {}
 
     /**
      * Calcule les jours en stock pour un produit donné.
@@ -37,7 +34,6 @@ class StockService extends BaseService
             if (!$product) {
                 throw new Exception('Product not found');
             }
-
             // Calculer le stock actuel
             $totalStock = $product->batches()->sum('quantity');
             $totalSold = $product->sales()->sum('quantity');
@@ -47,37 +43,22 @@ class StockService extends BaseService
             $startDate = Carbon::now()->subDays(30);
             $endDate = Carbon::now();
 
+            // Calculer le nombre de jours en stock
             $totalSoldLast30Days = $product->sales()
                 ->whereBetween('sale_date', [$startDate, $endDate])
                 ->sum('quantity');
 
+            // Calculer le taux de vente moyen par jour (sur les 30 derniers jours)
             $averageDailySales = $totalSoldLast30Days / 30;
 
             // Éviter une division par zéro
             if ($averageDailySales == 0) {
-                return [
-                    'success' => true,
-                    'data' => $currentStock > 0 ? INF : 0, // INF signifie que le stock ne diminue pas,
-                    'message' => 'Les jours en stock ont été récupérés avec succès.',
-                    'status' => 200,
-                ];
+                return ApiResponse::mapResponse($currentStock > 0 ? INF : 0, 'Les jours en stock ont été récupérés avec succès.', null, 200);
             }
-
-            return [
-                'success' => true,
-                'data' => $currentStock / $averageDailySales,
-                'message' => 'Les jours en stock ont été récupérés avec succès.',
-                'status' => 200,
-            ];
+            return ApiResponse::mapResponse($currentStock / $averageDailySales, 'Les jours en stock ont été récupérés avec succès.', null, 200);
         } catch (Exception $e) {
-            // En cas d'erreur : log et retour structuré
             Log::error('Erreur lors de la génération des jours en stock : ' . $e->getMessage());
-            return [
-                'success' => false,
-                'message' => 'Une erreur est survenue lors de la récupération des jours en stock.',
-                'error' => $e->getMessage(),
-                'status' => 500,
-            ];
+            return ApiResponse::mapResponse(null, 'Une erreur est survenue lors de la récupération des jours en stock.', $e->getMessage(), 500);
         }
     }
 
@@ -96,45 +77,26 @@ class StockService extends BaseService
             if (!$product) {
                 throw new Exception('Product not found');
             }
-
             // Récupérer les mouvements de stock pour ce produit
             $stockMovement = StockMovement::query()->where('product_id', $product->id)
                 ->paginate(5);
-
-            return [
-                'success' => true,
-                'data' => new StockMovementCollection($stockMovement) ?? [],
-                'message' => 'Les mouvements de stock ont été récupérés avec succès.',
-                'status' => 200,
-            ];
+            return ApiResponse::mapResponse(new StockMovementCollection($stockMovement), 'Les mouvements de stock ont été récupérés avec succès.', null, 200);
         } catch (Exception $e) {
             // En cas d'erreur : log et retour structuré
             Log::error('Erreur lors de la récupération des mouvements de stock : ' . $e->getMessage());
-            return [
-                'success' => false,
-                'message' => 'Une erreur est survenue lors de la récupération des mouvements de stock.',
-                'error' => $e->getMessage(),
-                'status' => 500,
-            ];
+            return ApiResponse::mapResponse(null, 'Une erreur est survenue lors de la récupération des mouvements de stock.', $e->getMessage(), 500);
         }
     }
 
     public function get(Request $request): array
     {
         try {
-            $products = Product::query()->paginate(3);
-            return [
-                'data' => $products,
-            ];
+            $products = Product::query()->paginate(10);
+            return ApiResponse::mapResponse($products, 'Liste des produits', null, 200);
         } catch (Exception $e) {
             // En cas d'erreur : log et retour structuré
             Log::error('Erreur lors de la récupération des produits : ' . $e->getMessage());
-            return [
-                'success' => false,
-                'message' => 'Une erreur est survenue lors de la récupération des produits.',
-                'error' => $e->getMessage(),
-                'status' => 500,
-            ];
+            return ApiResponse::mapResponse(null, 'Une erreur est survenue lors de la récupération des produits.', $e->getMessage(), 500);
         }
     }
 
@@ -142,26 +104,14 @@ class StockService extends BaseService
     {
         try {
             $product = Product::query()->find($id);
-
             if (!$product) {
                 throw new Exception('Product not found');
             }
-
-            return [
-                'success' => true,
-                'data' => $product,
-                'message' => 'Product retrieved successfully.',
-                'status' => 200,
-            ];
+            return ApiResponse::mapResponse($product, 'Product retrieved successfully', null, 200);
         } catch (Exception $e) {
             // En cas d'erreur : log et retour structuré
             Log::error('Erreur lors de la récupération du produit : ' . $e->getMessage());
-            return [
-                'success' => false,
-                'message' => 'Une erreur est survenue lors de la récupération du produit.',
-                'error' => $e->getMessage(),
-                'status' => 500,
-            ];
+            return ApiResponse::mapResponse(null, 'Une erreur est survenue lors de la récupération du produit.', $e->getMessage(), 500);
         }
     }
 
@@ -198,23 +148,13 @@ class StockService extends BaseService
 
             // Commit de la transaction si tout s'est bien passé
             DB::commit();
-            return [
-                'success' => true,
-                'data' => $product->id,
-                'message' => 'Product created successfully.',
-                'status' => 200,
-            ];
+            return ApiResponse::mapResponse($product->id, 'Product created successfully.', null, 200);
         } catch (Exception $e) {
             // Rollback en cas d'erreur
             DB::rollBack();
-            // En cas d'erreur : log et retour structuré
+
             Log::error('Erreur lors de la création du produit : ' . $e->getMessage());
-            return [
-                'success' => false,
-                'message' => 'Une erreur est survenue lors de la création du produit.',
-                'error' => $e->getMessage(),
-                'status' => 500,
-            ];
+            return ApiResponse::mapResponse(null, 'Une erreur est survenue lors de la création du produit.', $e->getMessage(), 500);
         }
     }
 
@@ -259,60 +199,29 @@ class StockService extends BaseService
             }
             // Commit de la transaction si tout s'est bien passé
             DB::commit();
-            return [
-                'success' => true,
-                'message' => 'Product updated successfully.',
-                'status' => 200,
-            ];
+            return ApiResponse::mapResponse(null, 'Product updated successfully.', null, 200);
         } catch (Exception $e) {
             // Rollback en cas d'erreur
             DB::rollBack();
-            // En cas d'erreur : log et retour structuré
+
             Log::error('Erreur lors de la mise à jour du produit : ' . $e->getMessage());
-            return [
-                'success' => false,
-                'message' => 'Une erreur est survenue lors de la mise à jour du produit.',
-                'error' => $e->getMessage(),
-                'status' => 500,
-            ];
+            return ApiResponse::mapResponse(null, 'Une erreur est survenue lors de la mise à jour du produit.', $e->getMessage(), 500);
         }
-    }
-
-    public static function new()
-    {
-        // TODO: Implement new() method.
-    }
-
-    public function attach(Collection $data, Model $model, $relation = null): JsonResponse
-    {
-        // TODO: Implement attach() method.
     }
 
     public function delete(int $id): array
     {
         try {
             $product = Product::query()->find($id);
-
             if (!$product) {
                 throw new Exception('Product not found');
             }
-
             $product->delete();
-
-            return [
-                'success' => true,
-                'message' => 'Product deleted successfully.',
-                'status' => 200,
-            ];
+            return ApiResponse::mapResponse(null, 'Product deleted successfully.', null, 200);
         } catch (Exception $e) {
             // En cas d'erreur : log et retour structuré
             Log::error('Erreur lors de la suppression du produit : ' . $e->getMessage());
-            return [
-                'success' => false,
-                'message' => 'Une erreur est survenue lors de la suppression du produit.',
-                'error' => $e->getMessage(),
-                'status' => 500,
-            ];
+            return ApiResponse::mapResponse(null, 'Une erreur est survenue lors de la suppression du produit.', $e->getMessage(), 500);
         }
     }
 }
