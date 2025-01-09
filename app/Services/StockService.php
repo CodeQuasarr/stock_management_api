@@ -53,12 +53,12 @@ class StockService extends BaseService
 
             // Éviter une division par zéro
             if ($averageDailySales == 0) {
-                return ApiResponse::mapResponse($currentStock > 0 ? INF : 0, 'Les jours en stock ont été récupérés avec succès.', null, 200);
+                return ApiResponse::mapResponse($currentStock > 0 ? INF : 0, 'Days in stock have been successfully recovered.', null, 200);
             }
-            return ApiResponse::mapResponse($currentStock / $averageDailySales, 'Les jours en stock ont été récupérés avec succès.', null, 200);
+            return ApiResponse::mapResponse($currentStock / $averageDailySales, 'Days in stock have been successfully recovered.', null, 200);
         } catch (Exception $e) {
             Log::error('Erreur lors de la génération des jours en stock : ' . $e->getMessage());
-            return ApiResponse::mapResponse(null, 'Une erreur est survenue lors de la récupération des jours en stock.', $e->getMessage(), 500);
+            return ApiResponse::mapResponse(null, 'An error occurred when retrieving days in stock.', $e->getMessage(), 500);
         }
     }
 
@@ -84,7 +84,7 @@ class StockService extends BaseService
         } catch (Exception $e) {
             // En cas d'erreur : log et retour structuré
             Log::error('Erreur lors de la récupération des mouvements de stock : ' . $e->getMessage());
-            return ApiResponse::mapResponse(null, 'Une erreur est survenue lors de la récupération des mouvements de stock.', $e->getMessage(), 500);
+            return ApiResponse::mapResponse(null, 'An error occurred when retrieving goods movements.', $e->getMessage(), 500);
         }
     }
 
@@ -111,7 +111,7 @@ class StockService extends BaseService
         } catch (Exception $e) {
             // En cas d'erreur : log et retour structuré
             Log::error('Erreur lors de la récupération du produit : ' . $e->getMessage());
-            return ApiResponse::mapResponse(null, 'Une erreur est survenue lors de la récupération du produit.', $e->getMessage(), 500);
+            return ApiResponse::mapResponse(null, 'An error has occurred during product recovery.', $e->getMessage(), 500);
         }
     }
 
@@ -154,7 +154,7 @@ class StockService extends BaseService
             DB::rollBack();
 
             Log::error('Erreur lors de la création du produit : ' . $e->getMessage());
-            return ApiResponse::mapResponse(null, 'Une erreur est survenue lors de la création du produit.', $e->getMessage(), 500);
+            return ApiResponse::mapResponse(null, 'An error occurred during product creation.', $e->getMessage(), 500);
         }
     }
 
@@ -179,7 +179,7 @@ class StockService extends BaseService
 
             if ($data['stock_quantity'] !== $product->stockTotals()) {
                 $batch = $product->batches();
-                if ($data['stock_quantity'] - $product->stockTotals()) {
+                if ($data['stock_quantity'] - $product->stockTotals() > 0) {
                     $product->stockMovements()->create([
                         'quantity' => $data['stock_quantity'] - $product->stockTotals(),
                         'movement_type' => 'IN',
@@ -205,7 +205,7 @@ class StockService extends BaseService
             DB::rollBack();
 
             Log::error('Erreur lors de la mise à jour du produit : ' . $e->getMessage());
-            return ApiResponse::mapResponse(null, 'Une erreur est survenue lors de la mise à jour du produit.', $e->getMessage(), 500);
+            return ApiResponse::mapResponse(null, 'An error occurred while updating the product.', $e->getMessage(), 500);
         }
     }
 
@@ -221,7 +221,7 @@ class StockService extends BaseService
         } catch (Exception $e) {
             // En cas d'erreur : log et retour structuré
             Log::error('Erreur lors de la suppression du produit : ' . $e->getMessage());
-            return ApiResponse::mapResponse(null, 'Une erreur est survenue lors de la suppression du produit.', $e->getMessage(), 500);
+            return ApiResponse::mapResponse(null, 'An error occurred while deleting the product.', $e->getMessage(), 500);
         }
     }
 }

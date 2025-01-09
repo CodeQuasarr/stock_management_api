@@ -13,11 +13,8 @@ Route::prefix('v1')->group(function () {
 
     Route::prefix('stocks')->group(function () {
         Route::get('statistics', [SotckStatisticController::class, 'index']);
-
-        Route::prefix('{productCode}')->group(function () {
-            Route::get('days-in-stock', [StockController::class, 'getDaysInStock']);
-            Route::get('mouvements', [StockController::class, 'getProductMovements']);
-        });
+        Route::get('/{productCode}/movements', [StockController::class, 'getProductMovements']);
+        Route::get('/{productCode}/days-in-stock', [StockController::class, 'getDaysInStock']);
     });
 
     Route::apiResource('stocks', StockController::class);

@@ -1,0 +1,803 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API Documentation",
+        "description": "Documentation for the API endpoints",
+        "contact": {
+            "email": "support@example.com"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8000/api/v1",
+            "description": "Local development server"
+        }
+    ],
+    "paths": {
+        "/api/v1/stock-statistics": {
+            "get": {
+                "tags": [
+                    "Stock Statistics"
+                ],
+                "summary": "Get stock statistics",
+                "operationId": "4740c389300a1febb4d2433695527d18",
+                "parameters": [
+                    {
+                        "name": "unique_code",
+                        "in": "query",
+                        "description": "Unique code of the product",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Statistiques récupérées avec succès."
+                                        },
+                                        "kpis": {
+                                            "$ref": "#/components/schemas/StockKpis"
+                                        },
+                                        "stockSelection": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "value": {
+                                                        "type": "string"
+                                                    },
+                                                    "label": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "stockEvolution": {
+                                            "properties": {
+                                                "labels": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "datasets": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "label": {
+                                                                "type": "string"
+                                                            },
+                                                            "data": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "type": "integer"
+                                                                }
+                                                            },
+                                                            "borderColor": {
+                                                                "type": "string"
+                                                            },
+                                                            "tension": {
+                                                                "type": "number"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "nullable": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Une erreur est survenue lors de la récupération des statistiques."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Error message"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/stocks": {
+            "get": {
+                "tags": [
+                    "Stocks"
+                ],
+                "summary": "List all stocks",
+                "operationId": "97a14e4fda9dfd79242ac25bca443f9c",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Product"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Stocks"
+                ],
+                "summary": "Create a new stock",
+                "operationId": "772181542681acb916105b3a6b24bf9c",
+                "requestBody": {
+                    "description": "Product data to create",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "unique_code",
+                                    "description",
+                                    "purchase_price",
+                                    "expiration_date",
+                                    "sale_price",
+                                    "stock_quantity",
+                                    "therapeutic_category",
+                                    "manufacturer"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Product"
+                                    },
+                                    "unique_code": {
+                                        "type": "string",
+                                        "example": "PROD123"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "A product description"
+                                    },
+                                    "purchase_price": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 10.99
+                                    },
+                                    "expiration_date": {
+                                        "type": "string",
+                                        "example": "2023-12-31"
+                                    },
+                                    "sale_price": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 19.99
+                                    },
+                                    "stock_quantity": {
+                                        "type": "integer",
+                                        "example": 100
+                                    },
+                                    "therapeutic_category": {
+                                        "type": "string",
+                                        "example": "Category"
+                                    },
+                                    "manufacturer": {
+                                        "type": "string",
+                                        "example": "Manufacturer XYZ"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Product created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Product created successfully."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "nullable": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "An error occurred while creating the product."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Error message"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/stocks/{id}": {
+            "get": {
+                "tags": [
+                    "Stocks"
+                ],
+                "summary": "Get a specific stock",
+                "operationId": "06e17ea518b37cb9bbab5ccf96323033",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the stock",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Product"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Stock not found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Stocks"
+                ],
+                "summary": "Update a product in stock",
+                "operationId": "6aa724500eb819114aced85290916d4b",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the product to update",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Product data to update",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "unique_code",
+                                    "description",
+                                    "sale_price",
+                                    "stock_quantity",
+                                    "therapeutic_category",
+                                    "manufacturer"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "OMEPRAZOLE"
+                                    },
+                                    "unique_code": {
+                                        "type": "string",
+                                        "example": "PROD123"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "A product description"
+                                    },
+                                    "sale_price": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 19.99
+                                    },
+                                    "stock_quantity": {
+                                        "type": "integer",
+                                        "example": 100
+                                    },
+                                    "therapeutic_category": {
+                                        "type": "string",
+                                        "example": "Category A"
+                                    },
+                                    "manufacturer": {
+                                        "type": "string",
+                                        "example": "Manufacturer XYZ"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Product updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Product updated successfully."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "nullable": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Product not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Product not found."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Product not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "An error occurred while updating the product."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Error message"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Stocks"
+                ],
+                "summary": "Delete a specific stock",
+                "operationId": "5d32980d124504b3819785635ac6ecbf",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the stock",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Stock deleted successfully"
+                    },
+                    "404": {
+                        "description": "Stock not found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/stocks/{productCode}/days-in-stock": {
+            "get": {
+                "tags": [
+                    "Stocks"
+                ],
+                "summary": "Get days in stock for a specific product",
+                "operationId": "39e5ec4a0c21c1ca9621b789776f8870",
+                "parameters": [
+                    {
+                        "name": "productCode",
+                        "in": "path",
+                        "description": "Unique code of the product",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "number",
+                                            "format": "float"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Product not found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/stocks/{productCode}/movements": {
+            "get": {
+                "tags": [
+                    "Stocks"
+                ],
+                "summary": "Get stock movements for a specific product",
+                "operationId": "4b33c34c27349eb30fd0182b7ceaede6",
+                "parameters": [
+                    {
+                        "name": "productCode",
+                        "in": "path",
+                        "description": "Unique code of the product",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Stock movements retrieved successfully."
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/StockMovement"
+                                            }
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "nullable": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Product not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Product not found."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Product not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "An error occurred while retrieving stock movements."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Error message"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "StockKpis": {
+                "title": "Stock KPIs",
+                "description": "Stock Key Performance Indicators",
+                "properties": {
+                    "id": {
+                        "description": "ID of the KPI",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "product_id": {
+                        "description": "ID of the product",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "stock_level": {
+                        "description": "Current stock level",
+                        "type": "integer"
+                    },
+                    "stock_value": {
+                        "description": "Total value of the stock",
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "created_at": {
+                        "description": "Creation date of the KPI",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "description": "Last update date of the KPI",
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "Product": {
+                "title": "Product",
+                "description": "Product model",
+                "properties": {
+                    "name": {
+                        "description": "Name of the product",
+                        "type": "string"
+                    },
+                    "unique_code": {
+                        "description": "Unique code of the product",
+                        "type": "string"
+                    },
+                    "therapeutic_category": {
+                        "description": "Therapeutic category of the product",
+                        "type": "string"
+                    },
+                    "purchase_price": {
+                        "description": "Purchase price of the product",
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "sale_price": {
+                        "description": "Sale price of the product",
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "profit_margin": {
+                        "description": "Profit margin of the product",
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "manufacturer": {
+                        "description": "Manufacturer of the product",
+                        "type": "string"
+                    },
+                    "description": {
+                        "description": "Description of the product",
+                        "type": "string"
+                    },
+                    "created_at": {
+                        "description": "Creation date of the product",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "description": "Last update date of the product",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "deleted_at": {
+                        "description": "Deletion date of the product",
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "StockMovement": {
+                "title": "StockMovement",
+                "description": "Stock Movement model",
+                "properties": {
+                    "id": {
+                        "description": "ID of the stock movement",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "product_id": {
+                        "description": "ID of the product",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "quantity": {
+                        "description": "Quantity of the movement",
+                        "type": "integer"
+                    },
+                    "movement_type": {
+                        "description": "Type of the movement (IN or OUT)",
+                        "type": "string"
+                    },
+                    "reason": {
+                        "description": "Reason for the movement",
+                        "type": "string"
+                    },
+                    "date": {
+                        "description": "Date of the movement",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "batch_id": {
+                        "description": "ID of the batch",
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "created_at": {
+                        "description": "Creation date of the movement",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "description": "Last update date of the movement",
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Stock Statistics",
+            "description": "API Endpoints for Stock Statistics"
+        },
+        {
+            "name": "Stocks",
+            "description": "Stocks"
+        }
+    ]
+}

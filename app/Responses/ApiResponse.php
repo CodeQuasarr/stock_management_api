@@ -41,8 +41,8 @@ class ApiResponse
         }
         return [
             'success' => false,
-            'message' => $message,
             'error' => $error,
+            'message' => $message,
             'status' => $code,
         ];
     }
@@ -58,8 +58,8 @@ class ApiResponse
         }
         return response()->json([
             'success' => false,
-            'message' => $message,
             'error' => $error,
+            'message' => $message,
         ], $code);
     }
 }
