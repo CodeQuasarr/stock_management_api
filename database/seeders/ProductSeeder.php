@@ -51,10 +51,10 @@ class ProductSeeder extends Seeder
         $productBatchs = [
             [
                 'product_id' => 1,
-                'expiration_date' => Carbon::now()->addMonths(12)->toDateString(),
+                'expiration_date' => Carbon::now()->subMonths(1)->toDateString(),
                 'quantity' => 100,
-                'created_at' => Carbon::now()->subMonths(2),
-                'updated_at' => Carbon::now()->subMonths(2),
+                'created_at' => Carbon::now()->subMonths(3),
+                'updated_at' => Carbon::now()->subMonths(3),
             ],
             [
                 'product_id' => 1,
@@ -179,7 +179,7 @@ class ProductSeeder extends Seeder
         foreach ($paracetamolSales as $sale) {
             StockMovement::create([
                 'product_id' => $sale->product_id,
-                'batch_id' => $paracetamolBatches->first()->id, // On associe la vente au premier lot disponible
+                'batch_id' => $paracetamolBatches->first()->id,
                 'type' => 'out',
                 'reason' => 'Vente',
                 'quantity' => $sale->quantity,
