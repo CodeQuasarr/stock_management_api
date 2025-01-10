@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api\V1\Stocks;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Stocks\CreateStockRequest;
+use App\Http\Requests\Stocks\UpdateStockRequest;
 use App\Http\Resources\Stocks\StockCollection;
 use App\Http\Resources\Stocks\StockResource;
 use App\Responses\ApiResponse;
@@ -12,11 +14,13 @@ use Illuminate\Http\Request;
 
 /**
  * @OA\Info(
- *     title="API Documentation",
+ *     title="Demo of Pharmaceutical Inventory Management",
  *     version="1.0.0",
- *     description="Documentation for the API endpoints",
+ *     description="This project is a demonstration of an API for pharmaceutical inventory management.",
  *     @OA\Contact(
- *         email="support@example.com"
+ *         email="samuel.anyaronke@gmail.com",
+ *          name="Samuel ANYARONKE",
+ *          url="https://main--dare-samuel.netlify.app/"
  *     ),
  *     @OA\License(
  *         name="Apache 2.0",
@@ -42,7 +46,7 @@ class StockController extends Controller
      *     tags={"Stocks"},
      *     @OA\Response(
      *         response=200,
-     *         description="Successful operation",
+     *         description="Product list successfully retrieved",
      *         @OA\JsonContent(
      *             type="array",
      *             @OA\Items(ref="#/components/schemas/Product")
@@ -106,7 +110,7 @@ class StockController extends Controller
      *     )
      * )
      */
-    public function store(Request $request): JsonResponse
+    public function store(CreateStockRequest $request): JsonResponse
     {
         $response = $this->stockService->create( collect($request->all()));
         return ApiResponse::sendResponse($response['data'] ?? null, $response['message'], $response['error'] ?? null, $response['status']);
@@ -206,7 +210,7 @@ class StockController extends Controller
      *     )
      * )
      */
-    public function update(Request $request, string $id): JsonResponse
+    public function update(UpdateStockRequest $request, string $id): JsonResponse
     {
         $response = $this->stockService->update( collect($request->all()), $id);
         return ApiResponse::sendResponse(null, $response['message'], $response['error'] ?? null, $response['status']);
@@ -376,6 +380,9 @@ class StockController extends Controller
      */
     public function getProductMovements(string $productCode): JsonResponse
     {
+        if (!$productCode) {
+            return ApiResponse::sendResponse(null, 'Product code is required', 'Product code is required', 400);
+        }
         $response = $this->stockService->getProductMovements($productCode);
         return ApiResponse::sendResponse($response['data'] ?? null, $response['message'], $response['error'] ?? null, $response['status']);
     }

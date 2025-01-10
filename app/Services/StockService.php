@@ -71,6 +71,9 @@ class StockService extends BaseService
     public function getProductMovements(string $productCode): array
     {
         try {
+            if (!$productCode) {
+                throw new Exception('Product code is required');
+            }
             // Récupérer le produit
             $product = Product::query()->where('unique_code', $productCode)->first();
 

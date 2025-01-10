@@ -5,7 +5,18 @@ return [
     'documentations' => [
         'default' => [
             'api' => [
-                'title' => 'L5 Swagger UI',
+                'title' => 'Pharmaceutical Inventory Management API',
+                'description' => 'Documentation of the API for pharmaceutical inventory management.',
+                'version' => '1.0.0',
+                'contact' => [
+                    'email' => 'samuel.anyaronke@gmail.com',
+                    'name' => 'ANYARONKE Samuel',
+                    'url' => 'https://main--dare-samuel.netlify.app/',
+                ],
+                'license' => [
+                    'name' => 'Apache 2.0',
+                    'url' => 'http://www.apache.org/licenses/LICENSE-2.0.html',
+                ],
             ],
 
             'routes' => [
