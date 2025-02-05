@@ -41,7 +41,12 @@ class StockStatisticService
                 'change_unsold_items' => $changeUnsoldItems,
             ]);
             DB::commit();
-            return $success;
+            return [
+                'success' => true,
+                'data' => $kpi,
+                'message' => 'KPIs enregistrés avec succès.',
+                'status' => 200,
+            ];
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Erreur lors du calcul des KPIs : ' . $e->getMessage());
