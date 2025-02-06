@@ -9,7 +9,7 @@ services:
         - APP_ENV=production
         - APP_DEBUG=false
         - APP_KEY=base64:base64:pbIe2dOTpTkWfXhJzADZ2ibYIC6xIzxgBvHy9fZ+axQ=
-        - DB_CONNECTION=mariadb
+        - DB_CONNECTION=mysql
         - DB_HOST=db
         - DB_PORT=3306
         - DB_DATABASE=stock_management_api
@@ -28,7 +28,7 @@ services:
       dockerfile: Dockerfile
 
   db:
-    image: mariadb:10.11
+    image: mysql
     container_name: stock_management_api_db
     environment:
       MYSQL_ROOT_PASSWORD: root
