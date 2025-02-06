@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             ProductBatchesSeeder::class,
             SalesSeeder::class,
             StockMovementSeeder::class,
+            KpisSeeder::class,
         ]);
     }
 }

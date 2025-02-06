@@ -21,12 +21,14 @@ class StockStatisticService
 
         // Récupérer les KPIs pour le mois courant et le mois précédent
         $currentKpi = $this->calculateKpiForMonth($productId, $currentMonth);
-        $lastKa = $this->calculateKpiForMonth($productId, $lastMonth);
+        $lastKpi = kpi::query()
+            ->where('product_id', $productId)
+            ->latest()->first()->toArray();
 
         // Calcule des changements
-        $changeStockValue = $this->calculateChange($currentKpi['stock_value'], $lastKa['stock_value']);
-        $changeStockRotation = $this->calculateChange($currentKpi['stock_rotation'], $lastKa['stock_rotation']);
-        $changeUnsoldItems = $this->calculateChange($currentKpi['unsold_items'], $lastKa['unsold_items']);
+        $changeStockValue = $this->calculateChange($currentKpi['stock_value'], $lastKpi['stock_value'] ?? 0);
+        $changeStockRotation = $this->calculateChange($currentKpi['stock_rotation'], $lastKpi['stock_rotation'] ?? 0);
+        $changeUnsoldItems = $this->calculateChange($currentKpi['unsold_items'], $lastKpi['unsold_items'] ?? 0);
 
         try {
             // Enregistrement des KPIs
@@ -186,6 +188,11 @@ class StockStatisticService
             });
 
             $product = Product::query()->where('unique_code', $uniqueCode ?? $stockItems[0]['value']);
+
+            if (!$product->exists()) {
+                throw new \Exception('Produit non trouvé.');
+            }
+
             $stockStatistic = $this->generateKpis($product->first());
             $stockEvolution = $this->getStockEvolutionForUser($product->first());
 
