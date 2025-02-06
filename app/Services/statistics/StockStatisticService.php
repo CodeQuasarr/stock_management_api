@@ -9,10 +9,168 @@ use App\Models\ProductBatch;
 use App\Models\Sale;
 use App\Models\StockMovement;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class StockStatisticService
 {
+
+    public function calculateMonthlyKpi(int $productId): array {
+        $currentMonth = Carbon::now();
+        $lastMonth = $currentMonth->copy()->subMonth();
+
+        // Récupérer les KPIs pour le mois courant et le mois précédent
+        $currentKpi = $this->calculateKpiForMonth($productId, $currentMonth);
+        $lastKpi = kpi::query()
+            ->where('product_id', $productId)
+            ->latest()->first()->toArray();
+
+        // Calcule des changements
+        $changeStockValue = $this->calculateChange($currentKpi['stock_value'], $lastKpi['stock_value'] ?? 0);
+        $changeStockRotation = $this->calculateChange($currentKpi['stock_rotation'], $lastKpi['stock_rotation'] ?? 0);
+        $changeUnsoldItems = $this->calculateChange($currentKpi['unsold_items'], $lastKpi['unsold_items'] ?? 0);
+
+        try {
+            // Enregistrement des KPIs
+            DB::beginTransaction();
+            $success = $kpi = kpi::create([
+                'product_id' => $productId,
+                'stock_value' => $currentKpi['stock_value'],
+                'change_stock_value' => $changeStockValue,
+                'stock_rotation' => $currentKpi['stock_rotation'],
+                'change_stock_rotation' => $changeStockRotation,
+                'unsold_items' => $currentKpi['unsold_items'],
+                'change_unsold_items' => $changeUnsoldItems,
+            ]);
+            DB::commit();
+            return [
+                'success' => true,
+                'data' => $kpi,
+                'message' => 'KPIs enregistrés avec succès.',
+                'status' => 200,
+            ];
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Erreur lors du calcul des KPIs : ' . $e->getMessage());
+            return [
+                'success' => false,
+                'message' => 'Une erreur est survenue lors du calcul des KPIs.',
+                'error' => $e->getMessage(),
+                'status' => 500,
+            ];
+        }
+
+    }
+
+    private function calculateChange(float $currentValue, float $lastValue): float|int
+    {
+        return ($lastValue != 0)
+            ? (($currentValue - $lastValue) / $lastValue) * 100
+            : 0;
+    }
+
+    /**
+     * Calcule les indicateurs clés de performance (KPI) pour un produit donné sur un mois spécifié.
+     *
+     * @param int $productId L'identifiant du produit.
+     * @param Carbon $month La date représentative du mois pour lequel les KPI doivent être calculés.
+     * @return array Un tableau contenant la valeur du stock, la rotation du stock et le nombre d'articles invendus.
+     */
+    public function calculateKpiForMonth(int $productId, $month): array
+    {
+        $startDate = $month->startOfMonth();
+        $endDate = $month->endOfMonth();
+
+        // Calculer les ventes pour le mois
+        $sales = $this->getMonthlySales($productId, $startDate, $endDate);
+
+        // Calculer les mouvements de stock pour le mois
+        $stockQuantity = $this->calculateStockMovementsForMonth($productId, $startDate, $endDate);
+
+        // Calculer les valeurs du stock et les composants
+        [$stockValue, $remainingStock] = $this->calculateStockValue($productId, $stockQuantity);
+
+        // Calculer les indicateurs clés
+        $stockRotation = $remainingStock > 0 ? $sales / $remainingStock : 0;
+        $unsoldItems = $remainingStock - $sales;
+
+        return [
+            'stock_value' => $stockValue,
+            'stock_rotation' => $stockRotation,
+            'unsold_items' => $unsoldItems,
+        ];
+    }
+
+
+    /**
+     * Récupère les ventes mensuelles pour un produit donné entre deux dates
+     * @param int $productId
+     * @param mixed $startDate
+     * @param mixed $endDate
+     * @return int
+     */
+    private function getMonthlySales(int $productId, $startDate, $endDate): int
+    {
+        return Sale::query()
+            ->where('product_id', $productId)
+            ->whereBetween('sale_date', [$startDate, $endDate])
+            ->sum('quantity');
+    }
+
+    /**
+     * Calcule les mouvements de stock pour un produit donné sur une période spécifiée.
+     *
+     * @param int $productId Identifiant du produit.
+     * @param mixed $startDate Date de début de la période.
+     * @param mixed $endDate Date de fin de la période.
+     * @return int Total des mouvements de stock (entrées - sorties) pour la période spécifiée.
+     */
+    private function calculateStockMovementsForMonth(int $productId, $startDate, $endDate): int
+    {
+        return StockMovement::query()
+            ->where('product_id', $productId)
+            ->whereBetween('date', [$startDate, $endDate])
+            ->get()
+            ->reduce(function ($total, $movement) {
+                return $movement->type === 'in'
+                    ? $total + $movement->quantity
+                    : $total - $movement->quantity;
+            }, 0);
+    }
+
+
+    /**
+     * Calcule la valeur totale du stock et le stock restant pour un produit donné
+     * @param int $productId
+     * @param int $stockQuantity
+     * @return array
+     */
+    private function calculateStockValue(int $productId, int $stockQuantity): array
+    {
+        $stockValue = 0;
+        $remainingStock = $stockQuantity;
+
+        ProductBatch::query()
+            ->where('product_id', $productId)
+            ->each(function ($batch) use (&$stockValue, &$remainingStock) {
+                $stockValue += $batch->quantity * $batch->product->purchase_price;
+                $remainingStock += $batch->quantity;
+            });
+
+        return [$stockValue, $remainingStock];
+    }
+
+
+
+
+
+
+
+
+
+
+
+
 
     /**
      * Récupération des statistiques de stock
@@ -30,6 +188,11 @@ class StockStatisticService
             });
 
             $product = Product::query()->where('unique_code', $uniqueCode ?? $stockItems[0]['value']);
+
+            if (!$product->exists()) {
+                throw new \Exception('Produit non trouvé.');
+            }
+
             $stockStatistic = $this->generateKpis($product->first());
             $stockEvolution = $this->getStockEvolutionForUser($product->first());
 
@@ -127,7 +290,7 @@ class StockStatisticService
      * @param string $productCode
      * @return float|int
      */
-    public function getTotalStockValue(string $productCode)
+    public function getTotalStockValue(string $productCode): float|int
     {
         $product = Product::query()->where('unique_code', $productCode)->first();
         return $product->batches->sum(function ($batch) use ($product) {

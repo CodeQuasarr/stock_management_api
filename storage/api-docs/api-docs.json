@@ -21,7 +21,7 @@
         }
     ],
     "paths": {
-        "/api/v1/stock-statistics": {
+        "/stocks/statistics": {
             "get": {
                 "tags": [
                     "Stock Statistics"
@@ -33,7 +33,7 @@
                         "name": "unique_code",
                         "in": "query",
                         "description": "Unique code of the product",
-                        "required": false,
+                        "required": true,
                         "schema": {
                             "type": "string"
                         }

@@ -1,0 +1,44 @@
+services:
+  app:
+    image: php:8.3-cli
+    container_name: stock_management_api
+    working_dir: /var/www/stock_management_api
+    volumes:
+      - .:/var/www/stock_management_api
+    environment:
+        - APP_ENV=production
+        - APP_DEBUG=false
+        - APP_KEY=base64:base64:pbIe2dOTpTkWfXhJzADZ2ibYIC6xIzxgBvHy9fZ+axQ=
+        - DB_CONNECTION=mariadb
+        - DB_HOST=db
+        - DB_PORT=3306
+        - DB_DATABASE=stock_management_api
+        - DB_USERNAME=user
+        - DB_PASSWORD=stock_management_api
+
+    command: bash -c "git config --global --add safe.directory /var/www/stock_management_api && composer install && php -S 0.0.0.0:8000 -t public"
+    ports:
+      - "8001:8001"
+    depends_on:
+      - db
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+  db:
+    image: mariadb:10.11
+    container_name: stock_management_api_db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: stock_management_api
+      MYSQL_USER: user
+      MYSQL_PASSWORD: stock_management_api
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:
