@@ -38,9 +38,11 @@ class KpisCommand extends Command
                 $stockStatisticService->calculateMonthlyKpi($product->getKey());
                 DB::commit();
             }
+            logger()->info('KPIs have been successfully calculated for all products.');
 
         } catch (\Exception $e) {
             DB::rollBack();
+            logger()->error('An error occurred while calculating KPIs: ' . $e->getMessage());
             $this->error('An error occurred while calculating KPIs: ' . $e->getMessage());
         }
     }

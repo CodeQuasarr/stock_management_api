@@ -13,7 +13,7 @@ Route::prefix('v1')->group(function () {
 
     Route::prefix('stocks')->group(function () {
         Route::get('statistics', [StockStatisticController::class, 'index']);
-        Route::get('/{productCode}/movements', [StockController::class, 'getProductMovements']);
+        Route::get('{productCode}/movements', [StockController::class, 'getProductMovements']);
         Route::get('/{productCode}/days-in-stock', [StockController::class, 'getDaysInStock']);
     });
 

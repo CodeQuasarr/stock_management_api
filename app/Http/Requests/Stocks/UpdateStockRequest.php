@@ -23,13 +23,14 @@ class UpdateStockRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
-            'unique_code' => ['required', 'string', 'max:255'],
-            'therapeutic_category' => ['required', 'string', 'max:255'],
-            'manufacturer' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string', 'max:255'],
-            'sale_price' => ['required', 'numeric'],
-            'stock_quantity' => ['required', 'numeric'],
+            'movement_type' => ['required', 'string', 'min:2', 'max:3'],
+            'movement_reason' => ['required', 'string', 'max:255'],
+//            'therapeutic_category' => ['required', 'string', 'max:255'],
+//            'manufacturer' => ['required', 'string', 'max:255'],
+//            'description' => ['required', 'string', 'max:255'],
+//            'sale_price' => ['required', 'numeric'],
+            'movement_quantity' => ['required', 'numeric'],
+            'expiration_date' => ['required', 'date'],
         ];
     }
 }

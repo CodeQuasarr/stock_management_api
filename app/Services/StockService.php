@@ -20,10 +20,10 @@ class StockService extends BaseService
     {}
 
     /**
-     * Calcule les jours en stock pour un produit donné.
+     * Calcule le nombre de jours en stock pour un produit donné en fonction de son code unique.
      *
-     * @param string $productCode
-     * @return array
+     * @param string $productCode Code unique du produit.
+     * @return array Réponse formatée incluant le nombre de jours en stock et un message de succès ou d'erreur.
      */
     public function getDaysInStock(string $productCode): array
     {
@@ -63,10 +63,10 @@ class StockService extends BaseService
     }
 
     /**
-     * Récupère les mouvements d'un produit donné.
+     * Récupère les mouvements de stock associés à un produit spécifique en fonction de son code unique.
      *
-     * @param string $productCode
-     * @return array
+     * @param string $productCode Code unique du produit pour lequel les mouvements de stock doivent être récupérés.
+     * @return array Réponse formatée contenant les mouvements de stock ou un message d'erreur.
      */
     public function getProductMovements(string $productCode): array
     {
@@ -91,6 +91,13 @@ class StockService extends BaseService
         }
     }
 
+
+    /**
+     * Récupère une liste de produits paginée.
+     *
+     * @param Request $request Instance de la requête HTTP.
+     * @return array Réponse formatée contenant la liste des produits ou un message d'erreur.
+     */
     public function get(Request $request): array
     {
         try {
@@ -103,6 +110,12 @@ class StockService extends BaseService
         }
     }
 
+    /**
+     * Récupère un produit spécifique en fonction de son identifiant unique.
+     *
+     * @param int $id Identifiant unique du produit.
+     * @return array Réponse formatée avec le statut et message de succès ou d'erreur.
+     */
     public function find(int $id): array
     {
         try {
@@ -118,11 +131,18 @@ class StockService extends BaseService
         }
     }
 
+    /**
+     * Crée un nouveau produit avec les données fournies.
+     *
+     * @param Collection $data Données de création du produit.
+     * @return array Réponse formatée avec le statut et message de succès ou d'erreur.
+     */
     public function create(Collection $data): array
     {
         // Début de la transaction
         DB::beginTransaction();
         try {
+
             $product = new Product();
             $fields = $this->getModelFields($data, $product);
             $product = $product->create($fields->toArray());
@@ -161,6 +181,14 @@ class StockService extends BaseService
         }
     }
 
+    /**
+     * Met à jour un produit existant avec les données fournies.
+     *
+     * @param Collection $data Données de mise à jour du produit.
+     * @param mixed $id Identifiant unique du produit.
+     * @param Model|null $model Instance du modèle, optionnelle.
+     * @return array Réponse formatée avec le statut et message de succès ou d'erreur.
+     */
     public function update(Collection $data, $id, Model $model = null): array
     {
         // Début de la transaction
@@ -172,35 +200,38 @@ class StockService extends BaseService
                 throw new Exception('Product not found');
             }
 
-            $product->update($data->toArray());
             $fields = $this->getModelFields($data, $product);
-            $success = $product->update($fields->toArray());
+            if (!$fields->isEmpty()) {
+                $success = $product->update($fields->toArray());
 
-            if (!$success) {
-                throw new Exception('Error updating product');
-            }
-
-            if ($data['stock_quantity'] !== $product->stockTotals()) {
-                $batch = $product->batches();
-                if ($data['stock_quantity'] - $product->stockTotals() > 0) {
-                    $product->stockMovements()->create([
-                        'quantity' => $data['stock_quantity'] - $product->stockTotals(),
-                        'movement_type' => 'IN',
-                        'reason' => 'Entrée de stock',
-                        'date' => Carbon::now(),
-                        'batch_id' => $batch->latest()->first()->id,
-                    ]);
-                } else {
-                    $product->stockMovements()->create([
-                        'quantity' => $product->stockTotals() - $data['stock_quantity'],
-                        'movement_type' => 'OUT',
-                        'reason' => 'Vente',
-                        'date' => Carbon::now(),
-                        'batch_id' => $batch->latest()->first()->id,
-                    ]);
+                if (!$success) {
+                    throw new Exception('Error updating product');
                 }
             }
-            // Commit de la transaction si tout s'est bien passé
+            if($data['movement_quantity']) {
+                $batch = null;
+                if ($data['movement_type'] === 'out') {
+                    $product->sales()->create([
+                        'quantity' => $data['movement_quantity'],
+                        'sale_date' => Carbon::now(),
+                    ]);
+                } else {
+                    $batch = $product->batches()->create([
+                        'quantity' => $data['movement_quantity'],
+                        'expiration_date' => Carbon::parse($data['expiration_date']),
+                    ]);
+                }
+                $product->stockMovements()->create([
+                    'product_id' => $product->id,
+                    'product_batch_id' => $product->batches()->latest()->first()->id,
+                    'quantity' => $data['movement_quantity'],
+                    'movement_type' => $data['movement_type'],
+                    'reason' => $data['movement_reason'],
+                    'date' => Carbon::now(),
+                    'batch_id' => $product->batches()->latest()->first()->id,
+                ]);
+            }
+
             DB::commit();
             return ApiResponse::mapResponse(null, 'Product updated successfully.', null, 200);
         } catch (Exception $e) {
